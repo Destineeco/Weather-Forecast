@@ -94,31 +94,46 @@ class WeatherService {
   // Fetch weather data for the given coordinates
   private async fetchWeatherData(coordinates: Coordinates): Promise<Weather[]> {
     try {
+      // Log the constructed weather API URL
       const weatherQuery = this.buildWeatherQuery(coordinates);
-      console.log('Fetching weather data from:', weatherQuery); // Log the weather API URL
+      console.log('Fetching weather data from:', weatherQuery); 
+  
+      // Make the fetch request to the weather API
       const response = await fetch(weatherQuery);
-      
+  
       // Check if the response is ok (status code 200)
       if (!response.ok) {
-        throw new Error(`Failed to fetch weather data: ${response.statusText}`);
+        throw new Error(`Failed to fetch weather data. Status: ${response.status}, Message: ${response.statusText}`);
       }
-
-      const data = await response.json();
-      console.log('Weather data received:', data); // Log the weather data response
-
-      // If no data found, throw an error
+  
+      // Read the response body as JSON
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        console.error('Error parsing response as JSON:', jsonError);
+        throw new Error('Failed to parse weather data');
+      }
+  
+      console.log('Weather data received:', data);  // Log the weather data response for debugging
+  
+      // If no data found or incorrect format, throw an error
       if (!data || !data.list || data.list.length === 0) {
-        throw new Error('Weather data not found');
+        throw new Error('Weather data not found or has an unexpected format');
       }
-
+  
+      // Parse the current weather and forecast
       const currentWeather = this.parseCurrentWeather(data.list[0]);
       const forecast = this.buildForecastArray(currentWeather, data.list);
+  
       return forecast;
     } catch (error: any) {
-      console.error('Error fetching weather data:', error);  // Log the error
-      throw new Error('Error fetching weather data');
+      // Log the error with more details for debugging
+      console.error('Error fetching weather data:', error.message);
+      throw new Error('Error fetching weather data: ' + error.message);  // Re-throw with a more specific message
     }
   }
+  
 
   // Parse the current weather from the response
   private parseCurrentWeather(response: any): Weather {
