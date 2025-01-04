@@ -13,24 +13,12 @@ router.post('/', async(req: Request, res: Response) => {
   
     WeatherService.getWeatherForCity(cityName).then((data) => {
       // Constructing newCity object based on the cityName and data
-      const newCity = {
-        id: 'unique-id',  // You would replace this with a real ID, e.g., UUID
-        name: cityName,
-        weatherData: data,  // Assuming you want to store the weather data as well
-      };
-  
-      // Now calling addCity with both cityName and the newCity object
-      HistoryService.addCity(cityName, newCity).then(() => {
-        // You can do something with the result here if needed
-        res.json(data);
-      }).catch(error => {
-        res.status(500).json({ error: 'Failed to add city to history', details: error });
-      });
-    }).catch(error => {
-      res.status(500).json({ error: 'Failed to get weather data', details: error });
+      HistoryService.addCity(cityName);
+
+      res.json(data);
     });
   } catch (error) {
-    res.status(500).json({ error: 'Internal server error', details: error });
+    res.status(500).json(error);
   }
   
 });

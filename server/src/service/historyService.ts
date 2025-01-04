@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises';
+import { v4 as uuidv4 } from 'uuid';
 
 // Define a City class with name and id properties
 class City {
@@ -55,26 +56,18 @@ class HistoryService {
   }
 
   // Method to add a city to the search history
-  async addCity(city: string, newCity: City): Promise<City> {
-    try {
-      const cities = await this.getCities();
+  async addCity(city: string, ): Promise<City> {
 
-      // Check if the city already exists by its name
-      const cityExists = cities.some((existingCity) => existingCity.name === city);
-      
-      if (cityExists) {
-        return newCity; // If the city exists, just return the city without adding it
-      }
-
-      // If city doesn't exist, add the new city to the list
-      const updatedCities = [...cities, newCity];
-      await this.write(updatedCities); // Write the updated list to the file
-
-      return newCity; // Return the newly added city
-    } catch (error) {
-      console.error('Error adding city:', error);
-      throw new Error('Failed to add city');
-    }
+    const newCity: City = { name: city, id: uuidv4() };
+    return await this.getCities()
+      .then((cities) => {
+        if (cities.find((index) => index.name === city)) {
+          return cities;
+        }
+        return [...cities, newCity];
+      })
+      .then((updatedCities) => this.write(updatedCities))
+      .then(() => newCity);
   }
 
   // Method to remove a city by its id from the search history

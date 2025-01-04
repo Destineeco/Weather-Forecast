@@ -68,5 +68,9 @@
 				"humidity": 44
 			}
 		]
+	},
+	{
+		"name": "chicago",
+		"id": "3f20cacc-9f5d-4223-9829-6c154fb91b7e"
 	}
 ]
