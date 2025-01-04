@@ -1,1 +1,12 @@
-[]
+[
+	{
+		"id": "unique-id",
+		"name": "Chicago",
+		"weatherData": {}
+	},
+	{
+		"id": "unique-id",
+		"name": "San Diego",
+		"weatherData": {}
+	}
+]
