@@ -6,8 +6,6 @@ dotenv.config();
 interface Coordinates {
   lat: number;
   lon: number;
-  
-
 }
 
 // Define the Weather class
@@ -56,19 +54,21 @@ class WeatherService {
       if (!this.baseUrl || !this.apiKey) {
         throw new Error('API base URL or API key not found');
       }
+      console.log('Fetching location data from query:', query); // Log the query
       const response: Coordinates[] = await fetch(query).then((res) =>
         res.json()
       );
+      console.log('Location data received:', response); // Log the location data
       return response[0];
     } catch (error) {
-      console.error(error);
+      console.error('Error fetching location data:', error); // Log error
       throw error;
     }
   }
 
   // Destructure the location data to get coordinates
   private destructureLocationData(locationData: Coordinates): Coordinates {
-    console.log('location', locationData);
+    console.log('Destructured location:', locationData);
     const { lat, lon } = locationData;
     return { lat, lon };
   }
@@ -76,7 +76,7 @@ class WeatherService {
   // Build the query for geolocation data
   private buildGeocodeQuery(): string {
     const currentQuery = `${this.baseUrl}/geo/1.0/direct?q=${this.city}&limit=1&appid=${this.apiKey}`;
-    console.log(currentQuery);
+    console.log('Geocode Query:', currentQuery); // Log the query string
     return currentQuery;
   }
 
@@ -94,18 +94,28 @@ class WeatherService {
   // Fetch weather data for the given coordinates
   private async fetchWeatherData(coordinates: Coordinates): Promise<Weather[]> {
     try {
-      const response = await fetch(this.buildWeatherQuery(coordinates)).then(
-        (res) => res.json()
-      );
-      if (!response) {
+      const weatherQuery = this.buildWeatherQuery(coordinates);
+      console.log('Fetching weather data from:', weatherQuery); // Log the weather API URL
+      const response = await fetch(weatherQuery);
+      
+      // Check if the response is ok (status code 200)
+      if (!response.ok) {
+        throw new Error(`Failed to fetch weather data: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log('Weather data received:', data); // Log the weather data response
+
+      // If no data found, throw an error
+      if (!data || !data.list || data.list.length === 0) {
         throw new Error('Weather data not found');
       }
 
-      const currentWeather = this.parseCurrentWeather(response.list[0]);
-      const forecast = this.buildForecastArray(currentWeather, response.list);
+      const currentWeather = this.parseCurrentWeather(data.list[0]);
+      const forecast = this.buildForecastArray(currentWeather, data.list);
       return forecast;
     } catch (error: any) {
-      console.error(error);
+      console.error('Error fetching weather data:', error);  // Log the error
       throw new Error('Error fetching weather data');
     }
   }
@@ -156,14 +166,16 @@ class WeatherService {
   async getWeatherForCity(city: string): Promise<Weather[]> {
     try {
       this.city = city;
+      console.log('Fetching weather for city:', city);  // Log city name
       const coordinates = await this.fetchAndDestructureLocationData();
+      
       if (coordinates) {
         const weather = await this.fetchWeatherData(coordinates);
         return weather;
       }
       throw new Error('Weather data not found');
     } catch (error: any) {
-      console.error(error);
+      console.error('Error occurred in getWeatherForCity:', error);  // Log error
       throw new Error('Failed to fetch weather data');
     }
   }
