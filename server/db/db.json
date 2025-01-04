@@ -8,5 +8,65 @@
 		"id": "unique-id",
 		"name": "San Diego",
 		"weatherData": {}
+	},
+	{
+		"id": "unique-id",
+		"name": "Boston",
+		"weatherData": [
+			{
+				"city": "Boston",
+				"date": "1/4/2025",
+				"icon": "03d",
+				"iconDescription": "scattered clouds",
+				"tempF": 29.14,
+				"windSpeed": 14.32,
+				"humidity": 47
+			},
+			{
+				"city": "Boston",
+				"date": "1/5/2025",
+				"icon": "04n",
+				"iconDescription": "overcast clouds",
+				"tempF": 26.44,
+				"windSpeed": 11.3,
+				"humidity": 58
+			},
+			{
+				"city": "Boston",
+				"date": "1/6/2025",
+				"icon": "04n",
+				"iconDescription": "broken clouds",
+				"tempF": 23.07,
+				"windSpeed": 9.1,
+				"humidity": 50
+			},
+			{
+				"city": "Boston",
+				"date": "1/7/2025",
+				"icon": "04n",
+				"iconDescription": "broken clouds",
+				"tempF": 22.77,
+				"windSpeed": 13.42,
+				"humidity": 52
+			},
+			{
+				"city": "Boston",
+				"date": "1/8/2025",
+				"icon": "03n",
+				"iconDescription": "scattered clouds",
+				"tempF": 20.68,
+				"windSpeed": 15.19,
+				"humidity": 45
+			},
+			{
+				"city": "Boston",
+				"date": "1/9/2025",
+				"icon": "04n",
+				"iconDescription": "overcast clouds",
+				"tempF": 18.86,
+				"windSpeed": 14.65,
+				"humidity": 44
+			}
+		]
 	}
 ]

@@ -6,6 +6,8 @@ dotenv.config();
 interface Coordinates {
   lat: number;
   lon: number;
+  
+
 }
 
 // Define the Weather class
@@ -41,7 +43,7 @@ class Weather {
 class WeatherService {
   private baseUrl: string | undefined;
   private apiKey: string | undefined;
-  private cityName = '';
+  private city = '';
 
   constructor() {
     this.baseUrl = process.env.API_BASE_URL || '';
@@ -49,12 +51,19 @@ class WeatherService {
   }
 
   // Fetch the location data based on city name
-  private async fetchLocationData(query: string): Promise<Coordinates> {
-    const apiResponse: Coordinates = await fetch(query).then((response) =>
-      response.json()
-    );
-    console.log('FETCH', apiResponse);
-    return apiResponse;
+  private async fetchLocationData(query: string){
+    try {
+      if (!this.baseUrl || !this.apiKey) {
+        throw new Error('API base URL or API key not found');
+      }
+      const response: Coordinates[] = await fetch(query).then((res) =>
+        res.json()
+      );
+      return response[0];
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 
   // Destructure the location data to get coordinates
@@ -66,7 +75,7 @@ class WeatherService {
 
   // Build the query for geolocation data
   private buildGeocodeQuery(): string {
-    const currentQuery = `${this.baseUrl}/data/2.5/weather?q=${this.cityName}&appid=${this.apiKey}`;
+    const currentQuery = `${this.baseUrl}/geo/1.0/direct?q=${this.city}&limit=1&appid=${this.apiKey}`;
     console.log(currentQuery);
     return currentQuery;
   }
@@ -106,7 +115,7 @@ class WeatherService {
     const parsedDate = dayjs.unix(response.dt).format('M/D/YYYY');
 
     const currentWeather = new Weather(
-      this.cityName,
+      this.city,
       parsedDate,
       response.weather[0].icon,
       response.weather[0].description || response.weather[0].main,
@@ -129,7 +138,7 @@ class WeatherService {
     filteredWeatherData.forEach((day: any) => {
       weatherForecast.push(
         new Weather(
-          this.cityName,
+          this.city,
           dayjs.unix(day.dt).format('M/D/YYYY'),
           day.weather[0].icon,
           day.weather[0].description || day.weather[0].main,
@@ -146,7 +155,7 @@ class WeatherService {
   // Get the weather for a specific city
   async getWeatherForCity(city: string): Promise<Weather[]> {
     try {
-      this.cityName = city;
+      this.city = city;
       const coordinates = await this.fetchAndDestructureLocationData();
       if (coordinates) {
         const weather = await this.fetchWeatherData(coordinates);
