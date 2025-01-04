@@ -25,14 +25,19 @@ router.post('/', async(req: Request, res: Response) => {
 
 // TODO: GET search history
 router.get('/history', async (_req: Request, res: Response) => {
-  HistoryService.getCities()
-    .then((data) => {
-      return res.json(data);
-    })
-    .catch((err) => {
-      res.status(500).json(err);
-    });
-  });
+  try {
+    const data = await HistoryService.getCities(); // Await the data directly
+    if (data) {
+      return res.json(data); // Return data if found
+    }
+    // If no data found, send a 404 error response
+    return res.status(404).json({ message: 'No search history found' });
+  } catch (err) {
+    console.error('Error retrieving history:', err); // Log the error for debugging
+    return res.status(500).json({ error: 'Failed to retrieve history' }); // Return error if something goes wrong
+  }
+});
+
 
 // * BONUS TODO: DELETE city from search history
 router.delete('/history/:id', async (_req: Request, res: Response) => {res.json('id history info')});

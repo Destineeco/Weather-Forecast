@@ -1,32 +1,27 @@
 import dotenv from 'dotenv';
 import express from 'express';
-import cors from 'cors';  // Import the CORS package
+import cors from 'cors';
 dotenv.config();
 
-// Import the routes
-import routes from './routes/index.js';
-
 const app = express();
-
 const PORT = process.env.PORT || 3001;
 
-// Enable CORS for all routes and origins (can be customized later)
-app.use(cors());  // Allow all domains by default
+// Configure CORS (Allowing frontend access)
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production'
+    ? 'https://weather-forecast11.onrender.com' // Production frontend URL
+    : 'http://localhost:3000',  // Local frontend URL
+}));
 
-// Optional: Restrict CORS to specific origins if needed
-// app.use(cors({
-//   origin: 'http://your-frontend-domain.com',  // Example: specify frontend domain
-// }));
-
-// TODO: Serve static files of entire client dist folder
-app.use(express.static('../client/dist'));
-
-// TODO: Implement middleware for parsing JSON and urlencoded form data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// TODO: Implement middleware to connect the routes
+// Routes
+import routes from './routes/index.js';
 app.use(routes);
 
-// Start the server on the port
-app.listen(PORT, () => console.log(`Listening on PORT: ${PORT}`));
+// Serve static files (for production)
+app.use(express.static('../client/dist'));
+
+// Start the server
+app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
